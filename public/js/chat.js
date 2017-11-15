@@ -19,15 +19,17 @@ function scrollToBottom() {
 socket.on('connect', function() {
   var params = $.deparam(window.location.search);
 
-  socket.emit('join', params, function (err) {
+  socket.emit('join', params, function(err) {
     if(err) {
       alert(err);
-      window.location.href = '/';
+      window.locaction.href = '/';
     } else {
-      console.log('No error');
+      console.log('No Error!');
     }
   });
 });
+
+
 
 socket.on('updateUserList', function (users) {
   var ol = $('<ol></ol>');
