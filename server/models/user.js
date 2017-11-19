@@ -79,6 +79,13 @@ UserSchema.statics.findByEmail = function (email, password) {
   });
 };
 
+UserSchema.statics.findEmail = async function(email, password) {
+  var User = this;
+
+  const user = await User.findOne({email});
+
+}
+
 UserSchema.statics.findByName = function (name, password) {
   var User = this;
 
