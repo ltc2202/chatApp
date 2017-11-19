@@ -2,7 +2,11 @@ const path = require('path');
 const http  = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
+const bodyParser = require('body-parser');
+const mongoose = require('./db/mongoose');
+const _ = require('lodash');
 
+const {UserModel} = require('./models/user');
 const {Users} = require('./utils/users');
 const {isRealString} = require('./utils/validation');
 const {generateMessage, generateLocationMessage} = require('./utils/message');
@@ -16,6 +20,7 @@ var io = socketIO(server);
 var users = new Users();
 
 app.use(express.static(publicPath));
+app.use(bodyParser.json());
 
 io.on('connection', (socket) => {
   console.log('New user connection');
@@ -61,6 +66,40 @@ io.on('connection', (socket) => {
       io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
     }
   });
+});
+
+app.post('/users', async (req, res) => {
+  try {
+    const body = _.pick(req.body, ['email', 'name', 'password']);
+    const user = new UserModel(body);
+    await user.save();
+    const token = await user.generateAuthToken();
+    res.header('x-auth', token).send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+app.post('/users/me', async (req, res) => {
+  const body = _.pick(req.body, ['email', 'password', 'name']);
+  if(!body.email) {
+    try {
+      const user = await UserModel.findByName(body.name, body.password);
+      const token = await user.generateAuthToken();
+      res.header('x-auth', token).send(user);
+    } catch (e) {
+      res.status(400).send(e);
+    }
+
+  } else {
+      try {
+        const user = await UserModel.findByEmail(body.email, body.password);
+        const token = await user.generateAuthToken();
+        res.header('x-auth', token).send(user);
+      } catch (e) {
+        res.status(400).send(e);
+      }
+  }
 });
 
 server.listen(port, () => {
