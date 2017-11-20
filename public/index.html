@@ -8,22 +8,51 @@
   </head>
   <body class="centered-form">
     <div class="centered-form__form">
-      <form action="/chat.html">
-        <div class="form-field">
-          <h3>Join a Chat</h3>
+      <form id="form-login">
+        <div>
+          <h3>ChatApp</h3>
         </div>
         <div class="form-field">
-          <label>Display name</label>
-          <input type="text" name="name" autofocus>
-        </div>
-        <div class="form-field">
-          <label>Room name</label>
-          <input type="text" name="room">
-        </div>
-        <div class="form-field">
-          <button>Join</button>
+          <div>
+            <label>Name or Email</label>
+            <input type="text" name="info-login" autofocus>
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input type="password" name="password-login">
+          </div>
+          <div class="form-field">
+            <button type="submit" id="btn-login">Log in</button>
+          </div>
         </div>
       </form>
     </div>
+    <div class="centered-form__form">
+      <form id="form-signup">
+        <div>
+          <h3>Create a new account</h3>
+        </div>
+        <div class="form-field">
+          <div>
+            <label>Email</label>
+            <input type="text" name="email" autofocus>
+          </div>
+          <div>
+            <label>Name</label>
+            <input type="text" name="name" autofocus>
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input type="password" name="password-signup">
+          </div>
+          <div class="form-field">
+            <button id="btn-signup" type="submit">Sign up</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <script src="/js/libs/jquery-3.2.1.min.js"></script>
+    <script src="/js/index.js"></script>
+    <script src="/js/libs/deparam.js"></script>
   </body>
 </html>

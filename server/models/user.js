@@ -79,12 +79,37 @@ UserSchema.statics.findByEmail = function (email, password) {
   });
 };
 
-UserSchema.statics.findEmail = async function(email, password) {
+UserSchema.statics.findByInfo = function (info, password) {
   var User = this;
+  return User.findOne({name: info}).then((user) => {
+    if(!user) {
+      return User.findOne({email: info}).then((user) => {
+        if(!user) {
+          return Promise.reject();
+        }
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(password, user.password, (err, res) => {
+            if(res) {
+              resolve(user);
+            } else {
+              reject(err);
+            }
+          });
+        });
+      })
+    }
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        if(res) {
+          resolve(user);
+        } else {
+          reject(err);
+        }
+      });
+    });
+  });
+};
 
-  const user = await User.findOne({email});
-
-}
 
 UserSchema.statics.findByName = function (name, password) {
   var User = this;

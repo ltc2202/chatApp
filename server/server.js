@@ -22,6 +22,62 @@ var users = new Users();
 app.use(express.static(publicPath));
 app.use(bodyParser.json());
 
+app.get('/lobby', (req, res) => {
+  res.sendFile(path.join(__dirname + '/../public/lobby.html'));
+});
+
+app.post('/users', async (req, res) => {
+  try {
+    const body = _.pick(req.body, ['email', 'name', 'password']);
+    const user = new UserModel(body);
+    await user.save();
+    const token = await user.generateAuthToken();
+    res.header('x-auth', token).send(user);
+    console.log(res);
+  } catch (e) {
+    console.log(e);
+    res.status(400).send(e);
+  }
+
+});
+
+// app.post('/users/me', async (req, res) => {
+//   const body = _.pick(req.body, ['email', 'password', 'name']);
+//   if(!body.email) {
+//     try {
+//       const user = await UserModel.findByName(body.name, body.password);
+//       const token = await user.generateAuthToken();
+//       res.header('x-auth', token).send(user);
+//     } catch (e) {
+//       res.status(400).send(e);
+//     }
+//
+//   } else {
+//       try {
+//         const user = await UserModel.findByEmail(body.email, body.password);
+//         const token = await user.generateAuthToken();
+//         res.header('x-auth', token).send(user);
+//       } catch (e) {
+//         res.status(400).send(e);
+//       }
+//   }
+// });
+
+app.post('/users/me', async (req, res) => {
+  const body = _.pick(req.body, ['info', 'password']);
+
+    try {
+      const user = await UserModel.findByInfo(body.info, body.password);
+      const token = await user.generateAuthToken();
+      res.header('x-auth', token).send(user);
+    } catch (e) {
+      console.log(res.body);
+      console.log(req.body);
+      res.status(400).send(e);
+    }
+
+});
+
 io.on('connection', (socket) => {
   console.log('New user connection');
 
@@ -68,39 +124,7 @@ io.on('connection', (socket) => {
   });
 });
 
-app.post('/users', async (req, res) => {
-  try {
-    const body = _.pick(req.body, ['email', 'name', 'password']);
-    const user = new UserModel(body);
-    await user.save();
-    const token = await user.generateAuthToken();
-    res.header('x-auth', token).send(user);
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
 
-app.post('/users/me', async (req, res) => {
-  const body = _.pick(req.body, ['email', 'password', 'name']);
-  if(!body.email) {
-    try {
-      const user = await UserModel.findByName(body.name, body.password);
-      const token = await user.generateAuthToken();
-      res.header('x-auth', token).send(user);
-    } catch (e) {
-      res.status(400).send(e);
-    }
-
-  } else {
-      try {
-        const user = await UserModel.findByEmail(body.email, body.password);
-        const token = await user.generateAuthToken();
-        res.header('x-auth', token).send(user);
-      } catch (e) {
-        res.status(400).send(e);
-      }
-  }
-});
 
 server.listen(port, () => {
   console.log(`Server is up on port ${port}`);
