@@ -33,7 +33,7 @@ app.post('/users', async (req, res) => {
     await user.save();
     const token = await user.generateAuthToken();
     res.header('x-auth', token).send(user);
-    console.log(res);
+    // console.log(res);
   } catch (e) {
     console.log(e);
     res.status(400).send(e);
